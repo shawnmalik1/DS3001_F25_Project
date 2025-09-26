@@ -155,7 +155,7 @@ Using IDs where possible minimizes mismatches from suffixes, abbreviations, and 
 
 \subsection*{Reading, Cleaning, and Preparation}
 \begin{enumerate}
-    \item  \textbf{Read data from a single source.} Sourcing from Basketball-Reference~\cite{bbref_contracts,bbref_advanced_stats_2025}, which is the single database for both of our data sets keeps identifiers consistent. Reading in as \texttt{csv} files allows for straightforward integration and ensures compatibility with subsequent data processing in Python. 
+    \item \textbf{Read data from a single source.} Sourcing from Basketball-Reference~\cite{bbref_contracts,bbref_advanced_stats_2025}, which is the single database for both of our data sets keeps identifiers consistent. Reading in as \texttt{csv} files allows for straightforward integration and ensures compatibility with subsequent data processing in Python.
     \item \textbf{Consolidate multi-team seasons.} Retain the consolidated ``xTM'' line; otherwise, keep the highest-\texttt{MP} stint. This yields exactly one prior-season stat line per player and prevents double-counting.
     \item \textbf{Parse money fields.} Strip ``\$'' and commas, coerce to numeric. Use 2025--26 base salary as the target; guaranteed totals span multiple years/options and are not modeled directly.
     \item \textbf{Handle missing data.} Drop rows missing the target salary or essential stats (e.g., \texttt{MP}, \texttt{Age}). Leave rarely used or mostly-empty fields (e.g., awards) out of the model.

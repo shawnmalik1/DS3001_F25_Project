@@ -84,10 +84,10 @@
 \icmlauthor{Huyen Huynh}{equal,yyy}
 \end{icmlauthorlist}
 
-\icmlaffiliation{yyy}{Department of XXX, University of Virginia, Charlottesville, Virginia, USA}
+\icmlaffiliation{yyy}{University of Virginia, Charlottesville, Virginia, USA}
 
-\icmlcorrespondingauthor{Firstname1 Lastname1}{first1.last1@xxx.edu}
-\icmlcorrespondingauthor{Firstname2 Lastname2}{first2.last2@www.uk}
+% \icmlcorrespondingauthor{Firstname1 Lastname1}{first1.last1@xxx.edu}
+% \icmlcorrespondingauthor{Firstname2 Lastname2}{first2.last2@www.uk}
 
 % You may provide any keywords that you
 % find helpful for describing your paper; these are used to populate
@@ -115,6 +115,52 @@
 \section{Data}
 \label{sec:data}
 
+\subsection*{Sources and Scope}
+All data, reports, and code will be at the link below:
+
+\url{https://github.com/shawnmalik1/DS3001_F25_Project}
+
+This project seeks to answer the question: Which performance metrics best predict NBA player salaries?
+
+This project combines two season-level player files:
+\begin{itemize}
+    \item \textbf{Player Performance} (\texttt{player\_stats.csv}): per-player statistics of NBA players for season 2024--25 from Basketball-Reference, including counting metrics (e.g., \texttt{G}, \texttt{MP}), efficiency and usage rates (e.g., \texttt{TS\%}, \texttt{3PAr}, \texttt{FTr}, \texttt{USG\%}), play-type rate stats (e.g., \texttt{AST\%}, \texttt{TRB\%}, \texttt{STL\%}, \texttt{BLK\%}, \texttt{TOV\%}), and all-in metrics (e.g., \texttt{PER}, \texttt{WS}, \texttt{WS/48}, \texttt{OBPM}, \texttt{DBPM}, \texttt{BPM}, \texttt{VORP}), plus demographics/role (\texttt{Age}, \texttt{Pos}, \texttt{Team}).
+    
+    \item \textbf{Player Salary} (\texttt{player\_salaries.csv}): per-player base-salary information from Basketball-Reference by future season (e.g., 2025--26, 2026--27, \ldots) and a total guaranteed money.
+\end{itemize}
+
+Both files are sourced from Basketball-Reference, which keeps naming and IDs consistent across statistics and contracts.
+The modeling target is \emph{next season's} base salary (2025--26), and predictors are taken from the immediately preceding season's on-court performance. This aligns the temporal sequence of ``performance $\rightarrow$ pay.''
+
+\subsection*{Unit of Analysis and Coverage}
+Basketball-Reference reports one row per team stint and, for traded players, sometimes an aggregated multi-team line (e.g. ``2TM / 3TM''). To keep things simple and consistent, we define one row per player-season by selecting the \textbf{single team stint with the most minutes} (\texttt{MP}) for each player. This yields a representative stat line while avoiding double-counting and extra aggregation steps.
+
+After this filtering, we merge the stats and salary files and retain only players with both a prior-season stat line and a 2025--26 base salary. Some players will drop because they lack a next-season salary (unsigned, two-way/10-day conversions) or did not log meaningful minutes in the prior season.
+
+\subsection*{Identifiers and Merge Strategy}
+When available, we use the Basketball-Reference player ID (e.g., \texttt{lillada01}) to create a common key \texttt{bbref\_id} and perform an \textbf{inner join}. If an ID is missing for a small number of rows, we fall back to a name-based merge after light name cleaning (standardizing suffixes such as ``Jr.''/``III'').  The team variable that appears in both datasets (\texttt{Team} in \texttt{player\_stats.csv} and \texttt{Tm} in \texttt{player\_salaries.csv}) also helps us to double-check the merging process after we rename them to be the same. 
+Using IDs where possible minimizes mismatches from suffixes, abbreviations, and nicknames.
+
+\subsection*{Key Variables}
+\textbf{Base salary (2025--26) ($y$)}: parsed from currency strings into numeric values (USD). The distribution is strongly right-skewed: many players have salaries around the league minimum, and a long tail up to super max-level salaries ($\sim\$60$M).
+
+\paragraph{Candidate predictors (\(X\))}
+\begin{itemize}
+    \item \textbf{Availability \& playing time:} \texttt{G} (Games), \texttt{MP} (Minutes Played). Minutes both signal value and stabilize stats.
+    \item \textbf{Efficiency \& usage:} \texttt{TS\%} (True Shooting Percentage), \texttt{3PAr} (3-Point Attempt Rate), \texttt{FTr} (Free Throw Attempt Rate), \texttt{USG\%} (Usage Percentage).
+    \item \textbf{Role/rate indicators:} \texttt{AST\%} (Assist Percentage), \texttt{TRB\%} (Total Rebound Percentage, which could be specified through \texttt{ORB\%}, Offensive Rebound Percentage, and \texttt{DRB\%}, Defensive Rebound Percentage), \texttt{STL\%} (Steal Percentage), \texttt{BLK\%} (Block Percentage), \texttt{TOV\%} (Turnover Percentage).
+    \item \textbf{Overall metrics:} \texttt{PER} (Player Efficiency Rating), \texttt{WS} (Win Shares), \texttt{WS/48} (Win Shares Per 48 Minutes), \texttt{OBPM} (Offensive Box Plus/Minus), \texttt{DBPM} (Defensive Box Plus/Minus), \texttt{BPM} (Box Plus/Minus), \texttt{VORP} (Value over Replacement Player).
+    \item \textbf{Demographics/role:} \texttt{Age}, \texttt{Pos} (Position). Team indicators are available if market/team effects are modeled.
+\end{itemize}
+
+\subsection*{Reading, Cleaning, and Preparation}
+\begin{enumerate}
+    \item \textbf{Consolidate multi-team seasons.} Retain the consolidated ``xTM'' line; otherwise, keep the highest-\texttt{MP} stint. This yields exactly one prior-season stat line per player and prevents double-counting.
+    \item \textbf{Parse money fields.} Strip ``\$'' and commas, coerce to numeric. Use 2025--26 base salary as the target; guaranteed totals span multiple years/options and are not modeled directly.
+    \item \textbf{Handle missing data.} Drop rows missing the target salary or essential stats (e.g., \texttt{MP}, \texttt{Age}). Leave rarely used or mostly-empty fields (e.g., awards) out of the model.
+    \item \textbf{Basic feature set.} Use straightforward predictors: \texttt{MP}, \texttt{G}, \texttt{TS\%}, \texttt{USG\%}, \texttt{AST\%}, \texttt{TRB\%}, \texttt{STL\%}, \texttt{BLK\%}, \texttt{TOV\%}, and one or two overall metrics (e.g., \texttt{BPM}, \texttt{WS}). Include \texttt{Age} and \texttt{Pos}.
+\end{enumerate}
+
 
 \bibliography{milestone_data}
 \bibliographystyle{icml2025}
@@ -125,16 +171,7 @@
 % APPENDIX
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\appendix
-\onecolumn
-\section{You \emph{can} have an appendix here.}
 
-You can have as much text here as you want. The main body must be at most $8$ pages long.
-For the final version, one more page can be added.
-If you want, you can use an appendix like this one.  
-
-The $\mathtt{\backslash onecolumn}$ command above can be kept in place if you prefer a one-column appendix, or can be removed if you prefer a two-column appendix.  Apart from this possible change, the style (font size, spacing, margins, page numbering, etc.) should be kept the same as the main body.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

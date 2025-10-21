@@ -60,8 +60,8 @@
 \begin{document}
 
 \twocolumn[
-\icmltitle{Milestone 1: \\
-            Data Description}
+\icmltitle{Milestone 2: \\
+            Pre-Analysis Plan}
 
 % It is OKAY to include author information, even for blind
 % submissions: the style file will automatically remove it for you
@@ -162,6 +162,59 @@ Using IDs where possible minimizes mismatches from suffixes, abbreviations, and 
     \item \textbf{Basic feature set.} Use straightforward predictors: \texttt{MP}, \texttt{G}, \texttt{TS\%}, \texttt{USG\%}, \texttt{AST\%}, \texttt{TRB\%}, \texttt{STL\%}, \texttt{BLK\%}, \texttt{TOV\%}, and one or two overall metrics (e.g., \texttt{BPM}, \texttt{WS}). Include \texttt{Age} and \texttt{Pos}. 
 
 \end{enumerate}
+
+\section{Methods and Results}
+\label{sec:Methods and Results}
+
+\subsection*{Method Overview}
+Our goal is to predict each player’s base salary for the 2025--26 NBA season using performance metrics from the 2024--25 season. 
+We treat this as a supervised regression problem where the target variable is salary (numeric, in USD) and the predictors are player-level statistics (e.g., minutes, efficiency, usage, and overall metrics).
+
+We plan to start with simple, interpretable models and gradually test more flexible ones. This helps us understand the data patterns and avoid overfitting.
+
+
+\subsection*{Models and Justification}
+
+1. \textbf{Linear Regression.}  
+A basic linear model will serve as our starting point. It shows how each variable (like minutes or win shares) is related to salary, holding others constant.
+
+2. \textbf{Ridge and Lasso Regression.}  
+Because many basketball stats are correlated (for example, WS and BPM), we will use Ridge and Lasso regression to handle multicollinearity and reduce overfitting. Lasso may also help identify which variables matter most by shrinking weaker predictors toward zero.
+
+3. \textbf{Random Forest.}  
+We will test a Random Forest model to see if nonlinear patterns improve predictions. This model can capture interactions and give a ranking of variable importance.
+
+\subsection*{Model Training Procedure}
+
+We will split the data into a training set (80\%) and a test set (20\%).  
+All numeric predictors will be standardized so that variables with large scales (like minutes played) do not dominate smaller-scale metrics (like percentages).
+
+Models will be trained using the \texttt{scikit-learn} package in Python. 
+For Ridge and Lasso, we will tune the regularization parameter using 5-fold cross-validation on the training set.
+
+\subsection*{Model Validation Plan}
+
+We will evaluate model performance on the test set using:
+\begin{itemize}
+    \item Root Mean Squared Error (RMSE)
+    \item Mean Absolute Error (MAE)
+    \item $R^2$ (coefficient of determination)
+\end{itemize}
+
+We will also compare predicted vs. actual salaries in scatterplots to see whether the model systematically over- or under-predicts certain players (for example, stars vs. bench players).
+
+\subsection*{Next Steps}
+
+Once models are trained and validated, we will compare them and interpret which performance metrics best explain or predict player salary. 
+
+We expect that metrics capturing playing time (MP), overall impact (WS, BPM, VORP), and efficiency (TS\%) will emerge as the strongest predictors.
+
+
+
+
+
+
+
 
 
 \bibliography{milestone_data}

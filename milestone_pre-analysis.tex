@@ -170,6 +170,8 @@ Using IDs where possible minimizes mismatches from suffixes, abbreviations, and 
 Our goal is to predict each player’s base salary for the 2025--26 NBA season using performance metrics from the 2024--25 season. 
 We treat this as a supervised regression problem where the target variable is salary (numeric, in USD) and the predictors are player-level statistics (e.g., minutes, efficiency, usage, and overall metrics).
 
+A basic exploratory data analysis (EDA) will be performed to examine relationships between the target and predictor variables. Visualizations such as histograms, scatter plots, and box plots will be used to assess variable distributions and potential associations. They could also provide some hints on potential transformation, and if there are any outliers or influential observations in our data. A correlation analysis will also be conducted to identify linear relationships and to consider removing predictors with weak correlations to the target variable, while remaining cautious of potential non-linear effects. An interaction term assessment will also be performed, as many basketball statistics are highly correlated (for example, \texttt{WS} and \texttt{BPM}), and exploring these interactions can help reveal combined effects among predictors before applying regularization methods such as Ridge and Lasso regression to address multicollinearity and reduce overfitting. 
+
 We plan to start with simple, interpretable models and gradually test more flexible ones. This helps us understand the data patterns and avoid overfitting.
 
 
@@ -179,7 +181,7 @@ We plan to start with simple, interpretable models and gradually test more flexi
 A basic linear model will serve as our starting point. It shows how each variable (like minutes or win shares) is related to salary, holding others constant.
 
 2. \textbf{Ridge and Lasso Regression.}  
-Because many basketball stats are correlated (for example, WS and BPM), we will use Ridge and Lasso regression to handle multicollinearity and reduce overfitting. Lasso may also help identify which variables matter most by shrinking weaker predictors toward zero.
+Because many basketball stats are correlated (for example, \texttt{WS} and \texttt{BPM}), we will use Ridge and Lasso regression to handle multicollinearity and reduce overfitting. Lasso may also help identify which variables matter most by shrinking weaker predictors toward zero.
 
 3. \textbf{Random Forest.}  
 We will test a Random Forest model to see if nonlinear patterns improve predictions. This model can capture interactions and give a ranking of variable importance.
@@ -201,13 +203,15 @@ We will evaluate model performance on the test set using:
     \item $R^2$ (coefficient of determination)
 \end{itemize}
 
-We will also compare predicted vs. actual salaries in scatterplots to see whether the model systematically over- or under-predicts certain players (for example, stars vs. bench players).
+We will also compare predicted vs. actual salaries in scatter plots to see whether the model systematically over- or under-predicts certain players (for example, stars vs. bench players).
+
+As for our \textbf{linear model, a model assumption} assessment should also be implemented to check if the regression assumptions are met. This would at least include a residual plot for the linear relationship and constant variance assumptions, a QQ plot for normality assumption, and a potential ACF plot to check independence of the data.  
 
 \subsection*{Next Steps}
 
 Once models are trained and validated, we will compare them and interpret which performance metrics best explain or predict player salary. 
 
-We expect that metrics capturing playing time (MP), overall impact (WS, BPM, VORP), and efficiency (TS\%) will emerge as the strongest predictors.
+We expect that metrics capturing playing time (\texttt{MP}), overall impact (\texttt{WS}, \texttt{BPM}, \texttt{VORP}), and efficiency (\texttt{TS\%}) will emerge as the strongest predictors.
 
 
 

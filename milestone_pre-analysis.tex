@@ -174,8 +174,9 @@ A basic exploratory data analysis (EDA) will be performed to examine relationshi
 
 We plan to start with simple, interpretable models and gradually test more flexible ones. This helps us understand the data patterns and avoid overfitting.
 
+This approach allows us to build understanding in stages: starting from interpretable linear models and extending to more flexible ensemble methods. The analysis will not only assess predictive accuracy but also interpret how various player performance indicators contribute to contract value. For example, we expect that players with strong efficiency metrics and playmaking roles may command higher salaries even if their raw counting stats (e.g., points or rebounds) are moderate. The results of early models will guide which variables or transformations to emphasize in subsequent iterations.
 
-\subsection*{Models and Justification}
+\subsection*{Models}
 
 1. \textbf{Linear Regression.}  
 A basic linear model will serve as our starting point. It shows how each variable (like minutes or win shares) is related to salary, holding others constant.
@@ -194,6 +195,9 @@ All numeric predictors will be standardized so that variables with large scales 
 Models will be trained using the \texttt{scikit-learn} package in Python. 
 For Ridge and Lasso, we will tune the regularization parameter using 5-fold cross-validation on the training set.
 
+Categorical variables such as player position will be one-hot encoded before model fitting. In addition, continuous variables with skewed distributions (such as salary and minutes) may be log-transformed to stabilize variance and improve model fit. The model pipeline will be implemented using the \texttt{scikit-learn} framework, allowing for standardized preprocessing, fitting, and evaluation steps across all model types.
+
+
 \subsection*{Model Validation Plan}
 
 We will evaluate model performance on the test set using:
@@ -205,7 +209,7 @@ We will evaluate model performance on the test set using:
 
 We will also compare predicted vs. actual salaries in scatter plots to see whether the model systematically over- or under-predicts certain players (for example, stars vs. bench players).
 
-As for our \textbf{linear model, a model assumption} assessment should also be implemented to check if the regression assumptions are met. This would at least include a residual plot for the linear relationship and constant variance assumptions, a QQ plot for normality assumption, and a potential ACF plot to check independence of the data.  
+As for our \textbf{linear model}, a model assumption assessment should also be implemented to check if the regression assumptions are met. This would at least include a residual plot for the linear relationship and constant variance assumptions, a QQ plot for normality assumption, and a potential ACF plot to check independence of the data.  
 
 \subsection*{Next Steps}
 

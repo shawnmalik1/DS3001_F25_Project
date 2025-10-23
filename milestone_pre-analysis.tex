@@ -178,38 +178,49 @@ This approach allows us to build understanding in stages: starting from interpre
 
 \subsection*{Models}
 
-1. \textbf{Linear Regression.}  
-A basic linear model will serve as our starting point. It shows how each variable (like minutes or win shares) is related to salary, holding others constant.
+Our analysis aims to identify which player performance metrics most strongly predict NBA salaries while balancing model interpretability and predictive accuracy. To do so, we adopt a staged modeling approach that begins with transparent, interpretable regression methods and progresses toward more flexible machine-learning models capable of capturing nonlinear relationships.
 
-2. \textbf{Ridge and Lasso Regression.}  
-Because many basketball stats are correlated (for example, \texttt{WS} and \texttt{BPM}), we will use Ridge and Lasso regression to handle multicollinearity and reduce overfitting. Lasso may also help identify which variables matter most by shrinking weaker predictors toward zero.
+1. \textbf{Linear Regression.}
+We begin with a standard linear regression model as a baseline to establish a direct, interpretable link between each performance metric and player salary. This model allows us to estimate marginal effects—how much salary changes, on average, with one-unit changes in metrics such as minutes played, win shares, or true shooting percentage, holding other factors constant. While simple, this model provides a clear benchmark and helps diagnose potential issues such as skewness, outliers, or multicollinearity before applying more complex methods.
 
-3. \textbf{Random Forest.}  
-We will test a Random Forest model to see if nonlinear patterns improve predictions. This model can capture interactions and give a ranking of variable importance.
+2. \textbf{Ridge and Lasso Regression.}
+Basketball statistics often exhibit high collinearity—for example, overall impact metrics such as \texttt{BPM}, \texttt{VORP}, and \texttt{WS} are strongly correlated. To address this, we employ Ridge and Lasso regression, which introduce regularization penalties to shrink coefficients and reduce variance. Ridge regression (L2 penalty) stabilizes estimates when predictors are correlated, while Lasso regression (L1 penalty) performs variable selection by shrinking some coefficients exactly to zero. By comparing the results of these two methods, we can both improve predictive performance and identify which features are consistently important across models.
 
-\subsection*{Model Training Procedure}
+3. \textbf{Random Forest.}
+To capture nonlinear relationships and higher-order interactions that linear models might overlook, we incorporate a Random Forest regressor. This ensemble approach aggregates multiple decision trees trained on bootstrapped samples of the data, using random feature selection at each split to enhance robustness. Random Forests handle outliers well and can model complex dependencies—such as the interaction between usage rate and efficiency—without explicit specification. Feature importance measures from this model will also be used to complement coefficient-based interpretations from the linear models.
 
-We will split the data into a training set (80\%) and a test set (20\%).  
-All numeric predictors will be standardized so that variables with large scales (like minutes played) do not dominate smaller-scale metrics (like percentages).
-
-Models will be trained using the \texttt{scikit-learn} package in Python. 
-For Ridge and Lasso, we will tune the regularization parameter using 5-fold cross-validation on the training set.
-
-Categorical variables such as player position will be one-hot encoded before model fitting. In addition, continuous variables with skewed distributions (such as salary and minutes) may be log-transformed to stabilize variance and improve model fit. The model pipeline will be implemented using the \texttt{scikit-learn} framework, allowing for standardized preprocessing, fitting, and evaluation steps across all model types.
-
+\paragraph{Implementation and Preprocessing.}
+All models are implemented in Python using the \texttt{scikit-learn} library. Numeric predictors are standardized to zero mean and unit variance to ensure comparability, and categorical variables (such as player position) are one-hot encoded. Salary, the dependent variable, is log-transformed to reduce right-skewness and stabilize variance, improving model fit. This unified modeling pipeline allows for reproducibility, consistent evaluation, and transparent comparison across modeling approaches.
 
 \subsection*{Model Validation Plan}
 
-We will evaluate model performance on the test set using:
+We evaluate model performance through a combination of quantitative metrics, visual diagnostics, and cross-validation to ensure that our findings are both accurate and generalizable.
+
+\paragraph{Data Splitting and Cross-Validation.}
+The dataset is partitioned into an 80\% training set and a 20\% held-out test set. Within the training data, we perform 5-fold cross-validation to tune hyperparameters—such as the regularization strength ($\alpha$) in Ridge and Lasso regression—based on predictive performance. This approach balances bias and variance, providing a fair assessment of how well each model generalizes to unseen players.
+
+\paragraph{Evaluation Metrics.}
+Each model is assessed using three complementary performance metrics:
 \begin{itemize}
-    \item Root Mean Squared Error (RMSE)
-    \item Mean Absolute Error (MAE)
-    \item $R^2$ (coefficient of determination)
+    \item \textbf{Root Mean Squared Error (RMSE)} – measures the magnitude of prediction errors, penalizing large deviations heavily.
+    \item \textbf{Mean Absolute Error (MAE)} – captures the average absolute difference between predicted and actual salaries, providing an interpretable measure of prediction accuracy.
+    \item \textbf{$R^2$ (Coefficient of Determination)} – quantifies the proportion of variance in salaries explained by the model.
 \end{itemize}
+Together, these metrics allow us to balance interpretability and predictive precision across linear and ensemble models.
 
-We will also compare predicted vs. actual salaries in scatter plots to see whether the model systematically over- or under-predicts certain players (for example, stars vs. bench players).
+\paragraph{Model Diagnostics.}
+For linear models, we will perform residual diagnostics to verify key assumptions:
+\begin{itemize}
+    \item \textbf{Linearity and Homoscedasticity:} Residuals versus fitted values plots will help assess whether variance is constant and relationships are approximately linear.
+    \item \textbf{Normality:} Q–Q plots of residuals will indicate whether the error terms are normally distributed.
+    \item \textbf{Independence:} An autocorrelation function (ACF) plot will ensure residuals are uncorrelated across observations.
+\end{itemize}
+If strong violations appear, transformations or alternative model structures (e.g., log-salary, interaction terms) will be considered.
 
-As for our \textbf{linear model}, a model assumption assessment should also be implemented to check if the regression assumptions are met. This would at least include a residual plot for the linear relationship and constant variance assumptions, a QQ plot for normality assumption, and a potential ACF plot to check independence of the data.  
+\paragraph{Model Comparison and Interpretation.}
+After validation, models will be compared on both test-set performance and interpretability. Visual tools such as predicted-versus-actual scatter plots will reveal systematic bias (e.g., underprediction of high earners). Coefficient magnitudes (from linear and regularized models) and feature importance scores (from Random Forest) will be jointly analyzed to identify which performance metrics consistently predict salary. We expect that indicators of playing time (\texttt{MP}), efficiency (\texttt{TS\%}), and overall impact (\texttt{BPM}, \texttt{VORP}, \texttt{WS}) will emerge as the strongest predictors.
+
+Finally, we will reflect on the uncertainty of our assessments—particularly for outlier cases such as rookies or players on unusual contract structures—and discuss how model limitations affect the confidence of our conclusions.
 
 \subsection*{Next Steps}
 

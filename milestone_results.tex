@@ -251,7 +251,7 @@ Overall, Lasso provides the best balance of interpretability and predictive perf
 \midrule
 OLS          & 0.602 & 0.503 & 0.591 \\
 Ridge        & 0.600 & 0.506 & 0.595 \\
-Lasso        & 0.599 & 0.505 & 0.596 \\
+Lasso        & \textbf{0.599} & 0.505 & \textbf{0.596} \\
 Random Forest & 0.610 & \textbf{0.481} & 0.581 \\
 \bottomrule
 \end{tabular}
@@ -287,7 +287,7 @@ Both models identify the same core predictors:
     \item \textbf{BPM}: Ridge = 0.197, Lasso = 0.198.
 \end{itemize}
 
-These variables reflect playing time, offensive load, and overall impact: central determinants of player valuation.
+These variables reflect playing time, offensive load, and overall impact, which are central determinants of player valuation.
 
 \paragraph{Weak or Negative Predictors.}
 \begin{itemize}
@@ -314,7 +314,19 @@ Thus, while nonlinear effects are present, most explainable variation appears to
 
 \subsection{Prediction Diagnostics}
 
-Residual and predicted-vs-actual plots reveal two systematic patterns:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Test Residual plot.png}
+    \caption{KDE of Test Residuals - Lasso}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Test Residual plot.png}
+    \caption{Test Residual Plot - Lasso}
+    \label{fig:placeholder}
+\end{figure}
+Residual plot (Figure 1) and predicted-vs-actual plot (Figure 2) reveal two systematic patterns:
 
 \begin{enumerate}
     \item \textbf{Underprediction of superstars.}  
@@ -325,6 +337,7 @@ Residual and predicted-vs-actual plots reveal two systematic patterns:
 \end{enumerate}
 
 For the majority of players in the mid-salary range, predictions are stable and unbiased.
+
 
 
 \subsection{Summary of Findings}

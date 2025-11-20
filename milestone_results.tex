@@ -218,7 +218,7 @@ For linear models, we will perform residual diagnostics to verify key assumption
 If strong violations appear, transformations or alternative model structures (e.g., log-salary, interaction terms) will be considered.
 
 \paragraph{Model Comparison and Interpretation.}
-After validation, models will be compared on both test-set performance and interpretability. Visual tools such as predicted-versus-actual scatter plots will reveal systematic bias (e.g., underprediction of high earners). Coefficient magnitudes (from linear and regularized models) and feature importance scores (from Random Forest) will be jointly analyzed to identify which performance metrics consistently predict salary. We expect that indicators of playing time (\texttt{MP}), efficiency (\texttt{TS\%}), and overall impact (\texttt{BPM}, \texttt{VORP}, \texttt{WS}) will emerge as the strongest predictors.
+After validation, models will be compared on both test-set performance and interpretability. Visual tools such as predicted-versus-actual scatter plots will reveal systematic bias (e.g., under-prediction of high earners). Coefficient magnitudes (from linear and regularized models) and feature importance scores (from Random Forest) will be jointly analyzed to identify which performance metrics consistently predict salary. We expect that indicators of playing time (\texttt{MP}), efficiency (\texttt{TS\%}), and overall impact (\texttt{BPM}, \texttt{VORP}, \texttt{WS}) will emerge as the strongest predictors.
 
 Finally, we will reflect on the uncertainty of our assessments—particularly for outlier cases such as rookies or players on unusual contract structures—and discuss how model limitations affect the confidence of our conclusions.
 
@@ -260,7 +260,7 @@ Random Forest & 0.610 & \textbf{0.481} & 0.581 \\
 
 \subsection{Random Forest Feature Importance}
 
-To examine nonlinear effects, we inspect feature importances from the Random Forest model. The top predictors are:
+To examine nonlinear effects, we inspect the importance of each feature from the Random Forest model. The top predictors are:
 
 \begin{itemize}
     \item \textbf{USG\%} (0.2499) --- the strongest predictor, reflecting offensive role and on-ball usage.
@@ -322,18 +322,18 @@ Thus, while nonlinear effects are present, most explainable variation appears to
 \end{figure}
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.75\linewidth]{Test Residual plot.png}
+    \includegraphics[width=0.75\linewidth]{Predicted vs Actual (test) –Lasso.png}
     \caption{Test Residual Plot - Lasso}
     \label{fig:placeholder}
 \end{figure}
 Residual plot (Figure 1) and predicted-vs-actual plot (Figure 2) reveal two systematic patterns:
 
 \begin{enumerate}
-    \item \textbf{Underprediction of superstars.}  
-    High-salary players are consistently underpredicted. These salaries are shaped by max-contract rules, branding value, and market dynamics unrelated to box score metrics.
+    \item \textbf{Under-prediction of superstars.}  
+    High-salary players are consistently under-predicted. These salaries are shaped by max-contract rules, branding value, and market dynamics unrelated to box score metrics.
 
     \item \textbf{Noisier predictions for low-minute players.}  
-    Bench players and rookies receive salaries influenced by draft position and contractual structures rather than performance, resulting in higher variance.
+    Bench players and rookies receive salaries influenced by their draft position and contractual structures, rather than their performance, resulting in higher variance.
 \end{enumerate}
 
 For the majority of players in the mid-salary range, predictions are stable and unbiased.
@@ -351,7 +351,7 @@ Across all models, a consistent set of predictors explains the majority of NBA s
     \item BPM/WS (overall impact).
 \end{itemize}
 
-These variables emerge as the strongest drivers in both linear and nonlinear frameworks. In contrast, position and narrower rate statistics contribute little once the core predictors are accounted for. The results suggest that teams primarily compensate players based on how much they play, how central they are to offensive creation, and how much value they generate in aggregate over the season.
+These variables emerge as the strongest drivers in both linear and nonlinear frameworks. In contrast, position and narrower rate statistics contribute little once the core predictors are taken into account. The results suggest that teams primarily compensate players based on how much they play, how central they are to offensive creation, and how much value they generate in aggregate over the season.
 
 
 

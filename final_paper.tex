@@ -1,0 +1,392 @@
+%%%%%%%% ICML 2025 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs} % for professional tables
+
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2025} with \usepackage[nohyperref]{icml2025} above.
+\usepackage{hyperref}
+
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Use the following line for the initial blind version submitted for review:
+% \usepackage{icml2025}
+
+% If accepted, instead use the following line for the camera-ready submission:
+\usepackage[accepted]{icml2025}
+
+% For theorems and such
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
+
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{Final Paper}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Final Paper\\
+            }
+
+% It is OKAY to include author information, even for blind
+% submissions: the style file will automatically remove it for you
+% unless you've provided the [accepted] option to the icml2025
+% package.
+
+% List of affiliations: The first argument should be a (short)
+% identifier you will use later to specify author affiliations
+% Academic affiliations should list Department, University, City, Region, Country
+% Industry affiliations should list Company, City, Region, Country
+
+% You can specify symbols, otherwise they are numbered in order.
+% Ideally, you should not use this facility. Affiliations will be numbered
+% in order of appearance and this is the preferred way.
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+\icmlauthor{Shawn Malik}{equal,yyy}
+\icmlauthor{Huyen Huynh}{equal,yyy}
+\icmlauthor{Wenwan Xu}{equal,yyy}
+\end{icmlauthorlist}
+
+\icmlaffiliation{yyy}{University of Virginia, Charlottesville, Virginia, USA}
+
+% \icmlcorrespondingauthor{Firstname1 Lastname1}{first1.last1@xxx.edu}
+% \icmlcorrespondingauthor{Firstname2 Lastname2}{first2.last2@www.uk}
+
+% You may provide any keywords that you
+% find helpful for describing your paper; these are used to populate
+% the "keywords" metadata in the PDF but will not be shown in the document
+\icmlkeywords{Machine Learning, ICML}
+
+\vskip 0.3in
+]
+
+% this must go after the closing bracket ] following \twocolumn[ ...
+
+% This command actually creates the footnote in the first column
+% listing the affiliations and the copyright notice.
+% The command takes one argument, which is text to display at the start of the footnote.
+% The \icmlEqualContribution command is standard text for equal contribution.
+% Remove it (just {}) if you do not need this facility.
+
+%\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+\printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+
+\begin{abstract}
+As one of the significant industries in American entertainment, the NBA franchises have significantly increased, averaging \$4.66 billion each in 2025, with predictions for continued growth.  This rising valuation underscores the escalating financial stakes and intensifying labor market competition in professional basketball. This project aimed to determine which performance metrics most accurately predict NBA player salaries. We constructed and compared the Ordinary Linear Regression (OLS) model, the Random Forest model, and the Ridge and Lasso regression models to find the model that could best predict the log player salary. Across all models, we determined that the Lasso model has the best prediction accuracy, with its lowest RMSE (0.599) and $R^2$ (0.596). We found that Usage Percentage (\texttt{USG\%}), Age (\texttt{Age}), Minutes Played (\texttt{MP}), and Box Plus/Minus (\texttt{BPM}) are the strongest four positive predictors, which also consistently explain the salary variation among all the models we tested. 
+
+\end{abstract}
+
+\section{Data}
+\label{sec:data}
+
+\subsection*{Sources and Scope}
+All data, reports, and code will be at the link below:
+
+\url{https://github.com/shawnmalik1/DS3001_F25_Project}
+
+This project seeks to answer the question: Which performance metrics best predict NBA player salaries? 
+
+This project combines two season-level player files:
+\begin{itemize}
+    \item \textbf{Player Performance} (\texttt{player\_stats.csv}): per-player statistics of NBA players for season 2024--25 from Basketball-Reference, including counting metrics (e.g., \texttt{G}, \texttt{MP}), efficiency and usage rates (e.g., \texttt{TS\%}, \texttt{3PAr}, \texttt{FTr}, \texttt{USG\%}), play-type rate stats (e.g., \texttt{AST\%}, \texttt{TRB\%}, \texttt{STL\%}, \texttt{BLK\%}, \texttt{TOV\%}), and all-in metrics (e.g., \texttt{PER}, \texttt{WS}, \texttt{WS/48}, \texttt{OBPM}, \texttt{DBPM}, \texttt{BPM}, \texttt{VORP}), plus demographics/role (\texttt{Age}, \texttt{Pos}, \texttt{Team}).
+    
+    \item \textbf{Player Salary} (\texttt{player\_salaries.csv}): per-player base-salary information from Basketball-Reference by future season (e.g., 2025--26, 2026--27, \ldots) and a total guaranteed money.
+\end{itemize}
+
+Both files are sourced from Basketball-Reference, which keeps naming and IDs consistent across statistics and contracts.
+The modeling target is \emph{next season's} base salary (2025--26), and predictors are taken from the immediately preceding season's on-court performance. This aligns the temporal sequence of ``performance $\rightarrow$ pay.''
+
+\subsection*{Unit of Analysis and Coverage}
+Basketball-Reference reports one row per team stint and, for traded players, sometimes an aggregated multi-team line (e.g. ``2TM / 3TM''). To keep things simple and consistent, we define one row per player-season by selecting the \textbf{single team stint with the most minutes} (\texttt{MP}) for each player. This yields a representative stat line while avoiding double-counting and extra aggregation steps if a player played for a team and then got traded to another team in the same season. We will use the team that had the highest stint for that player.
+
+After this filtering, we merge the stats and salary files and retain only players with both a prior-season stat line and a 2025--26 base salary. Not all players will meet both conditions, so some players will drop because they lack a next-season salary (unsigned, two-way/10-day conversions) or did not log meaningful minutes in the prior season.
+
+\subsection*{Identifiers and Merge Strategy}
+When available, we use the Basketball-Reference player ID (e.g., \texttt{lillada01}) to create a common key \texttt{bbref\_id} and perform an \textbf{inner join}. If an ID is missing for a small number of rows, we fall back to a name-based merge after light name cleaning (standardizing suffixes such as ``Jr.''/``III'').  The team variable that appears in both datasets (\texttt{Team} in \texttt{player\_stats.csv} and \texttt{Tm} in \texttt{player\_salaries.csv}) also helps us to double-check the merging process after we rename them to be the same. 
+Using IDs where possible minimizes mismatches from suffixes, abbreviations, and nicknames.
+
+\subsection*{Key Variables}
+\textbf{Base salary (2025--26) ($Y$)}: parsed from currency strings into numeric values (USD). The distribution is strongly right-skewed: many players have salaries around the league minimum, and a long tail up to super max-level salaries ($\sim\$60$M).
+
+\paragraph{Candidate predictors (\(X\))}
+\begin{itemize}
+    \item \textbf{Availability \& playing time:} \texttt{G} (Games), \texttt{MP} (Minutes Played). Minutes both signal value and stabilize stats.
+    \item \textbf{Efficiency \& usage:} \texttt{TS\%} (True Shooting Percentage), \texttt{3PAr} (3-Point Attempt Rate), \texttt{FTr} (Free Throw Attempt Rate), \texttt{USG\%} (Usage Percentage).
+    \item \textbf{Role/rate indicators:} \texttt{AST\%} (Assist Percentage), \texttt{TRB\%} (Total Rebound Percentage, which could be specified through \texttt{ORB\%}, Offensive Rebound Percentage, and \texttt{DRB\%}, Defensive Rebound Percentage), \texttt{STL\%} (Steal Percentage), \texttt{BLK\%} (Block Percentage), \texttt{TOV\%} (Turnover Percentage).
+    \item \textbf{Overall metrics:} \texttt{PER} (Player Efficiency Rating), \texttt{WS} (Win Shares), \texttt{WS/48} (Win Shares Per 48 Minutes), \texttt{OBPM} (Offensive Box Plus/Minus), \texttt{DBPM} (Defensive Box Plus/Minus), \texttt{BPM} (Box Plus/Minus), \texttt{VORP} (Value over Replacement Player).
+    \item \textbf{Demographics/role:} \texttt{Age}, \texttt{Pos} (Position). Team indicators are available if market/team effects are modeled.
+\end{itemize}
+
+\subsection*{Reading, Cleaning, and Preparation}
+\begin{enumerate}
+    \item  \textbf{Read data from a single source.} Sourcing from Basketball-Reference~\cite{bbref_contracts,bbref_advanced_stats_2025}, which is the single database for both of our data sets keeps identifiers consistent. Reading in as \texttt{csv} files allows for straightforward integration and ensures compatibility with subsequent data processing in Python. 
+    \item \textbf{Consolidate multi-team seasons.} Retain the consolidated ``xTM'' line; otherwise, keep the highest-\texttt{MP} stint. This yields exactly one prior-season stat line per player and prevents double-counting.
+    \item \textbf{Parse money fields.} Strip ``\$'' and commas, coerce to numeric. Use 2025--26 base salary as the target; guaranteed totals span multiple years/options and are not modeled directly.
+    \item \textbf{Handle missing data.} Drop rows missing the target salary or essential stats (e.g., \texttt{MP}, \texttt{Age}). Leave rarely used or mostly-empty fields (e.g., awards) out of the model.
+    \item \textbf{Basic feature set.} Use straightforward predictors: \texttt{MP}, \texttt{G}, \texttt{TS\%}, \texttt{USG\%}, \texttt{AST\%}, \texttt{TRB\%}, \texttt{STL\%}, \texttt{BLK\%}, \texttt{TOV\%}, and one or two overall metrics (e.g., \texttt{BPM}, \texttt{WS}). Include \texttt{Age} and \texttt{Pos}. 
+
+\end{enumerate}
+
+\section{Methods and Results}
+\label{sec:Methods and Results}
+
+\subsection*{Method Overview}
+Our goal is to predict each player’s base salary for the 2025--26 NBA season using performance metrics from the 2024--25 season. 
+We treat this as a supervised regression problem where the target variable is salary (numeric, in USD) and the predictors are player-level statistics (e.g., minutes, efficiency, usage, and overall metrics).
+
+A basic exploratory data analysis (EDA) will be performed to examine relationships between the target and predictor variables. Visualizations such as histograms, scatter plots, and box plots will be used to assess variable distributions and potential associations. They could also provide some hints on potential transformation, and if there are any outliers or influential observations in our data. A correlation analysis will also be conducted to identify linear relationships and to consider removing predictors with weak correlations to the target variable, while remaining cautious of potential non-linear effects. An interaction term assessment will also be performed, as many basketball statistics are highly correlated (for example, \texttt{WS} and \texttt{BPM}), and exploring these interactions can help reveal combined effects among predictors before applying regularization methods such as Ridge and Lasso regression to address multicollinearity and reduce overfitting. 
+
+We plan to start with simple, interpretable models and gradually test more flexible ones. This helps us understand the data patterns and avoid overfitting.
+
+This approach allows us to build understanding in stages: starting from interpretable linear models and extending to more flexible ensemble methods. The analysis will not only assess predictive accuracy but also interpret how various player performance indicators contribute to contract value. For example, we expect that players with strong efficiency metrics and playmaking roles may command higher salaries even if their raw counting stats (e.g., points or rebounds) are moderate. The results of early models will guide which variables or transformations to emphasize in subsequent iterations.
+
+\subsection*{Models}
+
+Our analysis aims to identify which player performance metrics most strongly predict NBA salaries while balancing model interpretability and predictive accuracy. To do so, we adopt a staged modeling approach that begins with transparent, interpretable regression methods and progresses toward more flexible machine-learning models capable of capturing nonlinear relationships.
+
+1. \textbf{Linear Regression.}
+We begin with a standard linear regression model as a baseline to establish a direct, interpretable link between each performance metric and player salary. This model allows us to estimate marginal effects—how much salary changes, on average, with one-unit changes in metrics such as minutes played, win shares, or true shooting percentage, holding other factors constant. While simple, this model provides a clear benchmark and helps diagnose potential issues such as skewness, outliers, or multicollinearity before applying more complex methods.
+
+2. \textbf{Ridge and Lasso Regression.}
+Basketball statistics often exhibit high collinearity—for example, overall impact metrics such as \texttt{BPM}, \texttt{VORP}, and \texttt{WS} are strongly correlated. To address this, we employ Ridge and Lasso regression, which introduce regularization penalties to shrink coefficients and reduce variance. Ridge regression (L2 penalty) stabilizes estimates when predictors are correlated, while Lasso regression (L1 penalty) performs variable selection by shrinking some coefficients exactly to zero. By comparing the results of these two methods, we can both improve predictive performance and identify which features are consistently important across models.
+
+3. \textbf{Random Forest.}
+To capture nonlinear relationships and higher-order interactions that linear models might overlook, we incorporate a Random Forest regressor. This ensemble approach aggregates multiple decision trees trained on bootstrapped samples of the data, using random feature selection at each split to enhance robustness. Random Forests handle outliers well and can model complex dependencies—such as the interaction between usage rate and efficiency—without explicit specification. Feature importance measures from this model will also be used to complement coefficient-based interpretations from the linear models.
+
+\paragraph{Implementation and Preprocessing.}
+All models are implemented in Python using the \texttt{scikit-learn} library. Numeric predictors are standardized to zero mean and unit variance to ensure comparability, and categorical variables (such as player position) are one-hot encoded. Salary, the dependent variable, is log-transformed to reduce right-skewness and stabilize variance, improving model fit. This unified modeling pipeline allows for reproducibility, consistent evaluation, and transparent comparison across modeling approaches.
+
+\subsection*{Model Validation Plan}
+
+We evaluate model performance through a combination of quantitative metrics, visual diagnostics, and cross-validation to ensure that our findings are both accurate and generalizable.
+
+\paragraph{Data Splitting and Cross-Validation.}
+The dataset is partitioned into an 80\% training set and a 20\% held-out test set. Within the training data, we perform 5-fold cross-validation to tune hyperparameters—such as the regularization strength ($\alpha$) in Ridge and Lasso regression—based on predictive performance. This approach balances bias and variance, providing a fair assessment of how well each model generalizes to unseen players.
+
+\paragraph{Evaluation Metrics.}
+Each model is assessed using three complementary performance metrics:
+\begin{itemize}
+    \item \textbf{Root Mean Squared Error (RMSE)} – measures the magnitude of prediction errors, penalizing large deviations heavily.
+    \item \textbf{Mean Absolute Error (MAE)} – captures the average absolute difference between predicted and actual salaries, providing an interpretable measure of prediction accuracy.
+    \item \textbf{$R^2$ (Coefficient of Determination)} – quantifies the proportion of variance in salaries explained by the model.
+\end{itemize}
+Together, these metrics allow us to balance interpretability and predictive precision across linear and ensemble models.
+
+\paragraph{Model Diagnostics.}
+For linear models, we will perform residual diagnostics to verify key assumptions:
+\begin{itemize}
+    \item \textbf{Linearity and Homoscedasticity:} Residuals versus fitted values plots will help assess whether variance is constant and relationships are approximately linear.
+    \item \textbf{Normality:} Q–Q plots of residuals will indicate whether the error terms are normally distributed.
+    \item \textbf{Independence:} An autocorrelation function (ACF) plot will ensure residuals are uncorrelated across observations.
+\end{itemize}
+If strong violations appear, transformations or alternative model structures (e.g., log-salary, interaction terms) will be considered.
+
+\paragraph{Model Comparison and Interpretation.}
+After validation, models will be compared on both test-set performance and interpretability. Visual tools such as predicted-versus-actual scatter plots will reveal systematic bias (e.g., under-prediction of high earners). Coefficient magnitudes (from linear and regularized models) and feature importance scores (from Random Forest) will be jointly analyzed to identify which performance metrics consistently predict salary. We expect that indicators of playing time (\texttt{MP}), efficiency (\texttt{TS\%}), and overall impact (\texttt{BPM}, \texttt{VORP}, \texttt{WS}) will emerge as the strongest predictors.
+
+Finally, we will reflect on the uncertainty of our assessments—particularly for outlier cases such as rookies or players on unusual contract structures—and discuss how model limitations affect the confidence of our conclusions.
+
+\subsection*{Next Steps}
+
+Once models are trained and validated, we will compare them and interpret which performance metrics best explain or predict player salary. 
+
+We expect that metrics capturing playing time (\texttt{MP}), overall impact (\texttt{WS}, \texttt{BPM}, \texttt{VORP}), and efficiency (\texttt{TS\%}) will emerge as the strongest predictors.
+
+
+\subsection{Model Performance}
+
+Table~\ref{tab:model-performance} summarizes out-of-sample predictive accuracy for the four models considered: OLS, Ridge, Lasso, and Random Forest. All models were trained on the same standardized feature set and evaluated on log-transformed salary.
+
+Across the linear models, regularization provides a small but consistent improvement over OLS. The \textbf{Lasso model achieves the lowest test RMSE (0.599)} and MAE (0.505) among the linear models, very slightly outperforming Ridge (RMSE 0.600) and OLS (RMSE 0.602). This reflects the benefit of coefficient shrinkage in reducing variance when predictors are highly correlated.
+
+The Random Forest regressor exhibits a different tradeoff: it attains the \textbf{lowest MAE (0.481)} among all models, indicating strong accuracy for typical cases, but a higher RMSE (0.610), suggesting greater difficulty predicting extreme high-salary outliers. Its test $R^2$ of 0.581 is competitive but falls short of the Lasso score of 0.596.
+
+Overall, Lasso provides the best balance of interpretability and predictive performance among the linear models and serves as our primary model for coefficient-based interpretation.
+
+\begin{table}[h]
+\centering
+\caption{Test-set performance across models. Lower RMSE/MAE is better; higher $R^2$ is better.}
+\label{tab:model-performance}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{RMSE} & \textbf{MAE} & \textbf{$R^2$} \\
+\midrule
+OLS          & 0.602 & 0.503 & 0.591 \\
+Ridge        & 0.600 & 0.506 & 0.595 \\
+Lasso        & \textbf{0.599} & 0.505 & \textbf{0.596} \\
+Random Forest & 0.610 & \textbf{0.481} & 0.581 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Random Forest Feature Importance}
+
+To examine nonlinear effects, we inspect the importance of each feature from the Random Forest model. The top predictors are:
+
+\begin{itemize}
+    \item \textbf{USG\%} (0.2499) --- the strongest predictor, reflecting offensive role and on-ball usage.
+    \item \textbf{Age} (0.2347) --- capturing nonlinear career-stage salary patterns.
+    \item \textbf{MP} (0.1723) --- availability and playing time as central drivers of compensation.
+    \item \textbf{BPM} (0.1008) --- overall player impact (box plus-minus).
+    \item \textbf{WS} (0.0836) --- total seasonal contribution.
+\end{itemize}
+
+Secondary predictors such as \texttt{AST\%}, \texttt{TRB\%}, \texttt{TS\%}, \texttt{BLK\%}, and \texttt{STL\%} contribute modestly. Positional indicators (e.g., \texttt{Pos\_SG}, \texttt{Pos\_PG}, \texttt{Pos\_SF}) have very low importance, suggesting that the model captures role differences more effectively through statistical performance metrics rather than categorical position labels.
+
+
+\subsection{Linear Model Coefficients: Ridge and Lasso}
+
+We examine Ridge and Lasso coefficients to interpret how individual predictors influence log-salary.
+
+\paragraph{Strong Positive Predictors.}
+Both models identify the same core predictors:
+
+\begin{itemize}
+    \item \textbf{MP}: Ridge = 0.556, Lasso = 0.630.
+    \item \textbf{Age}: Ridge = 0.369, Lasso = 0.372.
+    \item \textbf{USG\%}: Ridge = 0.266, Lasso = 0.262.
+    \item \textbf{BPM}: Ridge = 0.197, Lasso = 0.198.
+\end{itemize}
+
+These variables reflect playing time, offensive load, and overall impact, which are central determinants of player valuation.
+
+\paragraph{Weak or Negative Predictors.}
+\begin{itemize}
+    \item \textbf{G} has negative coefficients (Ridge = $-0.219$, Lasso = $-0.257$), likely because \texttt{MP} already captures availability more precisely.
+    \item \textbf{TS\%} shows small negative coefficients (Ridge = $-0.118$, Lasso = $-0.107$), reflecting collinearity with other offensive metrics.
+    \item Several predictors (e.g., \texttt{TRB\%}, \texttt{TOV\%}, positional dummies) receive coefficients near zero in the Lasso model, indicating limited marginal predictive power once stronger metrics are included.
+\end{itemize}
+
+Lasso’s sparsity highlights that a compact set of features: MP, Age, USG\%, and BPM capture most of the linear signal in salary determination.
+
+
+\subsection{Comparison Across Model Classes}
+
+Taken together, the models reveal several consistent themes:
+
+\begin{itemize}
+    \item \textbf{Linear structures explain most of the variance} in salaries; regularization improves generalization.
+    \item \textbf{Random Forest captures nonlinearities}, especially career-age effects and diminishing returns at extreme values of usage or minutes.
+    \item Despite this, Random Forest shows higher RMSE, suggesting sensitivity to extreme cases such as supermax contracts.
+\end{itemize}
+
+Thus, while nonlinear effects are present, most explainable variation appears to lie within a primarily linear framework.
+
+
+\subsection{Prediction Diagnostics}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Test Residual plot.png}
+    \caption{KDE of Test Residuals - Lasso}
+    \label{fig:placeholder}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Predicted vs Actual (test) –Lasso.png}
+    \caption{Test Residual Plot - Lasso}
+    \label{fig:placeholder}
+\end{figure}
+Residual plot (Figure 1) and predicted-vs-actual plot (Figure 2) reveal two systematic patterns:
+
+\begin{enumerate}
+    \item \textbf{Under-prediction of superstars.}  
+    High-salary players are consistently under-predicted. These salaries are shaped by max-contract rules, branding value, and market dynamics unrelated to box score metrics.
+
+    \item \textbf{Noisier predictions for low-minute players.}  
+    Bench players and rookies receive salaries influenced by their draft position and contractual structures, rather than their performance, resulting in higher variance.
+\end{enumerate}
+
+For the majority of players in the mid-salary range, predictions are stable and unbiased.
+
+
+
+\subsection{Summary of Findings}
+
+Across all models, a consistent set of predictors explains the majority of NBA salary variation:
+
+\begin{itemize}
+    \item USG\% (offensive role),  
+    \item Age (career stage),  
+    \item MP (availability), and  
+    \item BPM/WS (overall impact).
+\end{itemize}
+
+These variables emerge as the strongest drivers in both linear and nonlinear frameworks. In contrast, position and narrower rate statistics contribute little once the core predictors are taken into account. The results suggest that teams primarily compensate players based on how much they play, how central they are to offensive creation, and how much value they generate in aggregate over the season.
+
+
+
+\section{Conclusion}
+
+
+
+
+
+\bibliography{milestone_data}
+\bibliographystyle{icml2025}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDIX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
+
+
+% This document was modified from the file originally made available by
+% Pat Langley and Andrea Danyluk for ICML-2K. This version was created
+% by Iain Murray in 2018, and modified by Alexandre Bouchard in
+% 2019 and 2021 and by Csaba Szepesvari, Gang Niu and Sivan Sabato in 2022.
+% Modified again in 2023 and 2024 by Sivan Sabato and Jonathan Scarlett.
+% Previous contributors include Dan Roy, Lise Getoor and Tobias
+% Scheffer, which was slightly modified from the 2010 version by
+% Thorsten Joachims & Johannes Fuernkranz, slightly modified from the
+% 2009 version by Kiri Wagstaff and Sam Roweis's 2008 version, which is
+% slightly modified from Prasad Tadepalli's 2007 version which is a
+% lightly changed version of the previous year's version by Andrew
+% Moore, which was in turn edited from those of Kristian Kersting and
+% Codrina Lauth. Alex Smola contributed to the algorithmic style files.

@@ -120,9 +120,9 @@ We structured our data preparation in several steps:
 \subsection*{Method Overview}
 We treated the prediction of 2025--26 base salary as a supervised regression problem with log-transformed salary as the continuous target and player-level statistics as predictors. Before fitting models, we performed basic exploratory data analysis to understand the distribution of key variables and their pairwise relationships with salary. 
 
-We examined histograms for salary (Figure~\ref{fig:salaries_hist}) and major predictors, as well as scatter plots relating salary to playing time, age, usage, and overall impact metrics. These visualizations helped motivate the log transformation of salary and highlighted the presence of high-salary outliers and low-minute players with noisy performance statistics. Correlation matrices provided a first look at multicollinearity, especially among composite metrics such as \texttt{WS}, \texttt{BPM}, and \texttt{VORP}. We also inspected potential interactions informally, since many basketball statistics are mechanically related.
+We examined histograms for salary (Figure~\ref{fig:salaries_hist}) and major predictors. These visualizations helped motivate the log transformation of salary. After examining the scatter plots relating salary to playing time, age, usage, and overall impact metrics (Appendix~\ref{fig:predictor_scatterplots}), we found that there is a presence of high-salary outliers and low-minute players with noisy performance statistics. Correlation matrices provided a first look at multicollinearity, especially among composite metrics such as \texttt{WS}, \texttt{BPM}, and \texttt{VORP}. We also inspected potential interactions informally, since many basketball statistics are mechanically related.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=1\linewidth]{histogram of salaries (original and logged).png}
     \caption{Histogram of Salaries}
@@ -303,4 +303,24 @@ Despite these caveats, our results already provide a useful and interpretable su
 
 \bibliography{milestone_data}
 \bibliographystyle{icml2025}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDIX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\appendix
+\onecolumn
+
+\section{Exploratory Data Analysis: Predictor vs. Log-transformed salaries scatter plots}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{predictor scatter plot.png}
+    \label{fig:predictor_scatterplots}
+\end{figure}
+
+
 \end{document}
